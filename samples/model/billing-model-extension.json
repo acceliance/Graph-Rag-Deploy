@@ -1,0 +1,39 @@
+{
+  "version": "1.0.0",
+  "classes": {
+    "Customer": {
+      "identity": ["siret"],
+      "normalise": { "siret": "digits", "name": "casefold" },
+      "match": "fuzzy",
+      "fuzzyThreshold": 0.92,
+      "reviewBand": 0.75,
+      "anchor": true,
+      "extractionHints": "The SIRET is a 14-digit number, often printed with spaces (123 456 789 00012) in the header or footer. 'Client', 'Facturé à', 'Bill to' introduce the customer block."
+    },
+    "Invoice": {
+      "identity": ["number"],
+      "normalise": { "number": "trim" },
+      "anchor": true,
+      "extractionHints": "French invoices print 'Facture n°', 'Date', 'Échéance', 'Total HT', 'TVA', 'Total TTC'. Amounts use a comma decimal separator and a space thousands separator (1 234,56 €). A line 'Contrat : CT-77' or 'Réf. contrat' references the contract."
+    },
+    "InvoiceLine": {
+      "extractionHints": "One entity per table row of the lines table: Désignation / Quantité / Prix unitaire HT / Montant HT."
+    },
+    "Contract": {
+      "identity": ["contractNumber"],
+      "normalise": { "contractNumber": "casefold" },
+      "embed": ["scope"],
+      "anchor": true,
+      "extractionHints": "Contract references look like CT-<digits>. When an invoice only mentions the reference, extract the Contract with its number only."
+    }
+  },
+  "groups": {
+    "billing": ["Customer", "Invoice", "InvoiceLine"],
+    "contracts": ["Contract"]
+  },
+  "gate": {
+    "similarityFloor": 0.35,
+    "coverageFloor": 0.10,
+    "confidenceThreshold": 0.5
+  }
+}

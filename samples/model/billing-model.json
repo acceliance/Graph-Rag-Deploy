@@ -1,0 +1,75 @@
+{
+  "classes": [
+    {
+      "name": "Customer",
+      "domain": "Billing",
+      "description": "A company or person invoiced by the organisation. Identified by its SIRET when French, otherwise by name.",
+      "attributes": [
+        { "name": "name", "type": "String", "description": "Legal name as printed on the document (raison sociale)" },
+        { "name": "siret", "type": "String", "description": "French company identifier, 14 digits (SIRET); may be printed with spaces" },
+        { "name": "address", "type": "String", "description": "Postal address, one line" },
+        { "name": "email", "type": "String", "description": "Contact e-mail address" }
+      ],
+      "relations": []
+    },
+    {
+      "name": "Contract",
+      "domain": "Contracts",
+      "description": "A framework or service contract that invoices may reference.",
+      "attributes": [
+        { "name": "contractNumber", "type": "String", "description": "Contract reference (e.g. CT-77)" },
+        { "name": "title", "type": "String", "description": "Contract title or object" },
+        { "name": "startDate", "type": "Date", "description": "Start of the contract period" },
+        { "name": "endDate", "type": "Date", "description": "End of the contract period" },
+        { "name": "scope", "type": "String", "description": "Description of the services covered (free text, may be long)" }
+      ],
+      "relations": [
+        { "name": "customer", "target": "Customer", "cardinality": "ManyToOne", "description": "The customer party of the contract" }
+      ]
+    },
+    {
+      "name": "InvoiceLine",
+      "domain": "Billing",
+      "description": "One line of an invoice: a labelled quantity at a unit price. Value object owned by its invoice.",
+      "attributes": [
+        { "name": "label", "type": "String", "description": "Description of the item or service" },
+        { "name": "quantity", "type": "Double", "description": "Quantity invoiced" },
+        { "name": "unitPrice", "type": "Double", "description": "Unit price excluding tax" },
+        { "name": "amountExclTax", "type": "Double", "description": "Line total excluding tax (montant HT)" }
+      ],
+      "relations": []
+    },
+    {
+      "name": "Invoice",
+      "domain": "Billing",
+      "description": "An invoice issued to a customer, with its lines, totals, status and optional contract reference.",
+      "attributes": [
+        { "name": "number", "type": "String", "description": "Invoice number as printed (numéro de facture)" },
+        { "name": "issueDate", "type": "Date", "description": "Issue date (date d'émission)" },
+        { "name": "dueDate", "type": "Date", "description": "Payment due date (date d'échéance)" },
+        { "name": "totalExclTax", "type": "Double", "description": "Total excluding tax (total HT)" },
+        { "name": "totalInclTax", "type": "Double", "description": "Total including tax (total TTC)" },
+        { "name": "currency", "type": "String", "description": "ISO 4217 currency code (EUR, USD…)" }
+      ],
+      "relations": [
+        { "name": "customer", "target": "Customer", "cardinality": "ManyToOne", "description": "The invoiced customer" },
+        { "name": "lines", "target": "InvoiceLine", "cardinality": "OneToMany", "description": "The invoice lines" },
+        { "name": "contract", "target": "Contract", "cardinality": "ManyToOne", "description": "The contract this invoice is issued under, when referenced" },
+        { "name": "status", "target": { "name": "InvoiceStatus" }, "cardinality": "OneToOne", "description": "Lifecycle status of the invoice" }
+      ]
+    }
+  ],
+  "enumerations": [
+    {
+      "name": "InvoiceStatus",
+      "domain": "Billing",
+      "description": "Lifecycle status of an invoice",
+      "values": [
+        { "value": "DRAFT", "description": "Not yet issued (brouillon)" },
+        { "value": "ISSUED", "description": "Issued, awaiting payment (émise)" },
+        { "value": "PAID", "description": "Paid in full (payée)" },
+        { "value": "CANCELLED", "description": "Cancelled (annulée)" }
+      ]
+    }
+  ]
+}

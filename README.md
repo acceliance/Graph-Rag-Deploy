@@ -67,10 +67,15 @@ Never run `docker compose up --build` here: there is no source tree and no `buil
    three slots, enter the key or the on-premises URL, press *Test*. For an on-premises server
    also set the context window the model was loaded with. Keys are stored under `./data/api`
    and re-read on every request — no restart.
-3. **Model** (*Model*). Upload a model JSON, or click *Load the sample* (billing model). Fill
-   the extension: which attributes identify an instance of each class, how to normalise them,
-   which classes drive the relevance gate. *Initialise*. The model is projected into Neo4j as a
-   metamodel and rendered as a Mermaid diagram.
+3. **Model** (*Model*). Upload a model JSON, or click *Load the sample* (billing model). Check
+   its Graph-RAG settings: which attributes identify an instance of each class, how to
+   normalise them, which classes drive the relevance gate. They are GraphRag stereotypes inside
+   the model, so a ModelioUtils export annotated with the GraphRag module arrives filled in;
+   what you change in the editor is written back into the model. *Initialise*. The model is
+   projected into Neo4j as a metamodel and rendered as a Mermaid diagram. No model yet?
+   [`schemas/README.md`](schemas/README.md) explains how to draft one with an AI assistant from
+   the schema and the sample. Relevance-gate thresholds are set per model version afterwards
+   (*AI settings*).
 4. **Documents.** Drop PDFs. Each one is parsed (OCR for scanned pages), checked for relevance
    against the model (a cooking recipe against a billing model is rejected with a reason),
    extracted, written to the graph and indexed. Try `samples/pdf/` — see
@@ -214,7 +219,8 @@ docker-compose.yaml          the stack (pull only, no build)
 scripts/up.sh · up.ps1       preflight, secrets, pull, start, wait
 scripts/backup.sh · .ps1     cold backup of ./data + .env
 reverse-proxy/               nginx and Apache TLS front-door examples
-samples/model/               billing model + Graph-RAG extension
+schemas/                     JSON Schema for the model, ledger and prompt files — see schemas/README.md
+samples/model/               billing model (Graph-RAG settings as GraphRag stereotypes)
 samples/pdf/                 two invoices (one references a missing contract) + one recipe
 samples/profiles/            financial-analyst.md · enterprise-architect.md
 data/                        created at first start, never committed

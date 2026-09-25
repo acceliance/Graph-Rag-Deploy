@@ -14,7 +14,7 @@ images are free of charge under their own licence — see *Licence* at the end.
 
 > **Status.** The product images referenced in `.env.example` (`acceliance/graphrag-api`,
 > `acceliance/graphrag-web`) are published with the first release. Until that release is
-> promoted to Docker Hub, `docker compose pull` will fail on those two images — the kit itself
+> published on Docker Hub, `docker compose pull` will fail on those two images — the kit itself
 > is final.
 
 ---
@@ -187,7 +187,7 @@ Ingestion speed is bound by the extraction model, not by the stores.
 |---|---|
 | `required variable NEO4J_PASSWORD is missing a value` | `.env` missing or the line empty. Run `scripts/up.sh`, or set both secrets by hand |
 | `graphrag-api` restarts, log says `/data` not writable | Linux bind-mount ownership: `sudo chown -R 10001:10001 data/api` |
-| `docker compose pull` fails on `acceliance/graphrag-*` | The release is not promoted yet, or the tag in `.env` does not exist. Check the tag on Docker Hub |
+| `docker compose pull` fails on `acceliance/graphrag-*` | The release is not published yet, or the tag in `.env` does not exist. Check the tag on Docker Hub |
 | `toomanyrequests` from Docker Hub | Anonymous limit (100 pulls / 6 h per IP). `docker login` with a free account raises it |
 | Login page never appears, cookie warnings in the browser | Serving over plain HTTP with `AUTH_COOKIE_SECURE=true`. Use HTTPS, or set it to `false` for a pilot |
 | MCP client gets `421` | `MCP_ALLOWED_HOSTS` does not include the host:port used by the client |

@@ -84,7 +84,10 @@ Never run `docker compose up --build` here: there is no source tree and no `buil
    [`samples/README.md`](samples/README.md) for what to expect.
 5. **Agent.** Ask. Every factual sentence carries a citation `[document p.N]` that opens the
    page. Pick a **profile** (*financial analyst*, *enterprise architect*, or your own) to change
-   the agent's role and persona; import the two samples from *Admin ▸ Profiles*.
+   the agent's role and persona; import the two samples from *Admin ▸ Profiles*. To write your
+   own profile, draft its prompt with the Acceliance prompt generator at
+   <https://masterprompter.acceliance.fr>, then transcribe the generated fields into the
+   profile's front-matter (see [`schemas/README.md`](schemas/README.md)).
 
 ## 4. Configuration reference
 

@@ -65,7 +65,9 @@ output will fail the checks of the *Model* screen.
 Only the model is authored. The ingestion ledger is written by the API and is never uploaded,
 so its schema is a reading aid, not an input for generation. Agent profiles are Markdown files
 with front-matter; start from [`samples/profiles/`](../samples/profiles/) rather than from the
-prompt schema.
+prompt schema. To ease writing the prompt itself, draft it with the Acceliance prompt
+generator at <https://masterprompter.acceliance.fr>, then transcribe the generated fields into the
+profile's front-matter.
 
 1. Attach two files: `schema_uml_model.json` and
    [`samples/model/billing-model-stereotyped.json`](../samples/model/billing-model-stereotyped.json).

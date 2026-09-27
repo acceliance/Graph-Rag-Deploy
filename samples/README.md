@@ -12,6 +12,11 @@ on-premises model behaves before trusting it.
 | `profiles/financial-analyst.md` | Agent profile: role and persona of a financial analyst (French) | Import from *Admin ▸ Profiles*, select it in *Agent*, ask *"Quel est le total TTC facturé à ACME ?"* |
 | `profiles/enterprise-architect.md` | Agent profile: enterprise architect, dependency-oriented, adds an optional *Cartographie* section | Ask *"Quelles entités dépendent du contrat CT-77 ?"* — the answer must flag CT-77 as referenced but undocumented |
 
+To write your own profile, draft its prompt with the Acceliance prompt generator at
+<https://masterprompter.acceliance.fr>, then transcribe the generated fields into the
+front-matter of a copy of one of the two sample profiles (see
+[`../schemas/README.md`](../schemas/README.md)).
+
 ## Relevance-gate thresholds for the sample
 
 The thresholds are not part of the model: they are settings of each model version. After

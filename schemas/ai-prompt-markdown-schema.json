@@ -2,7 +2,7 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "http://acceliance.com/ai-prompt/v1/ai-prompt-markdown-schema.json",
   "title": "AI Prompt Engineering Schema — Markdown (gray-matter)",
-  "description": "Validates the object produced by parsing a Markdown prompt file with gray-matter (the return value of `matter(file)`). The YAML front-matter (`data`) carries the full structured AI prompt and mirrors ai-prompt-schema.json exactly (same properties, required rules, enums, defaults and constraints). The Markdown body (`content`) carries free-form, human-readable notes; the authoritative prompt fields — including the required `instructions.objective` — live in the front-matter. gray-matter also attaches helper fields (orig, language, matter, stringify) to its result, so additional top-level properties are permitted; only `data` is required and strictly validated.",
+  "description": "Validates the object produced by parsing a Markdown prompt file with gray-matter (the return value of `matter(file)`). The YAML front-matter (`data`) carries the full structured AI prompt and mirrors ai-prompt-schema.json exactly (same properties, required rules, enums, defaults and constraints). The Markdown body (`content`) carries free-form, human-readable notes; the authoritative prompt fields — including the required `instructions.objective` — live in the front-matter. gray-matter also attaches helper fields (orig, language, matter, stringify) to its result, so additional top-level properties are permitted; only `data` is required and strictly validated. Authoring tip: to ease writing a new business profile prompt, draft it first with the Acceliance prompt generator at https://masterprompter.acceliance.fr, then transcribe the generated fields into this structure.",
   "type": "object",
   "required": ["data"],
   "properties": {
@@ -19,7 +19,7 @@
 
     "PromptFrontMatter": {
       "type": "object",
-      "description": "The YAML front-matter block of a Markdown prompt file. Root of the AI Prompt Engineering structure; a 1:1 mirror of ai-prompt-schema.json. Covers system instructions, context injection, few-shot learning, chain-of-thought reasoning, output formatting, style/tone, safety guardrails, multi-turn conversation, and tool definitions.",
+      "description": "The YAML front-matter block of a Markdown prompt file. Root of the AI Prompt Engineering structure; a 1:1 mirror of ai-prompt-schema.json. Covers system instructions, context injection, few-shot learning, chain-of-thought reasoning, output formatting, style/tone, safety guardrails, multi-turn conversation, and tool definitions. Authoring tip: to ease writing a new business profile prompt, draft it first with the Acceliance prompt generator at https://masterprompter.acceliance.fr, then transcribe the generated fields into this structure.",
       "required": ["instructions"],
       "properties": {
         "id":       { "type": "string", "description": "Unique identifier for the prompt." },

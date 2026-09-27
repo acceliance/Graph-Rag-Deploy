@@ -1,5 +1,10 @@
 # Acceliance Graph-RAG — deployment kit
 
+[![Maintained by Acceliance](https://img.shields.io/badge/maintained%20by-Acceliance-0072C6)](https://github.com/acceliance)
+[![License: Apache-2.0](https://img.shields.io/badge/license-Apache--2.0-success)](LICENSE)
+[![Last commit](https://img.shields.io/github/last-commit/acceliance/Graph-Rag-Deploy?label=last%20commit)](https://github.com/acceliance/Graph-Rag-Deploy/commits/main)
+[![Docker Hub](https://img.shields.io/badge/images-Docker%20Hub-2496ED?logo=docker&logoColor=white)](https://hub.docker.com/u/acceliance)
+
 Turn a folder of PDFs into a **typed knowledge graph** you can question. You declare a data
 model once (classes, attributes, relations, enumerations); the product extracts matching data
 from every PDF into **Neo4j**, keeps the evidence (chunks and pages) in **Qdrant**, and answers

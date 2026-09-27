@@ -10,12 +10,14 @@ vLLM, Open WebUI…).
 This repository is the **deployment kit only**: a Compose file, an environment template, start
 and backup scripts, reverse-proxy examples and samples. It builds nothing; it pulls the
 published images. **Free to deploy**: the kit is open source (Apache 2.0) and the product
-images are free of charge under their own licence — see *Licence* at the end.
+images are **free of use and free of charge** under their own licence — see *Licence* at the
+end, and *Licensing* (§9a) for how to let Acceliance know you're a customer.
 
 > **Status.** The product images referenced in `.env.example` (`acceliance/graphrag-api`,
-> `acceliance/graphrag-web`) are published with the first release. Until that release is
-> published on Docker Hub, `docker compose pull` will fail on those two images — the kit itself
-> is final.
+> `acceliance/graphrag-web`) are published with the first release, on the Acceliance Docker Hub
+> organisation: [hub.docker.com/u/acceliance](https://hub.docker.com/u/acceliance). Until that
+> release is published, `docker compose pull` will fail on those two images — the kit itself is
+> final.
 
 ---
 
@@ -187,7 +189,7 @@ Ingestion speed is bound by the extraction model, not by the stores.
 |---|---|
 | `required variable NEO4J_PASSWORD is missing a value` | `.env` missing or the line empty. Run `scripts/up.sh`, or set both secrets by hand |
 | `graphrag-api` restarts, log says `/data` not writable | Linux bind-mount ownership: `sudo chown -R 10001:10001 data/api` |
-| `docker compose pull` fails on `acceliance/graphrag-*` | The release is not published yet, or the tag in `.env` does not exist. Check the tag on Docker Hub |
+| `docker compose pull` fails on `acceliance/graphrag-*` | The release is not published yet, or the tag in `.env` does not exist. Check the tag on [Docker Hub](https://hub.docker.com/u/acceliance) |
 | `toomanyrequests` from Docker Hub | Anonymous limit (100 pulls / 6 h per IP). `docker login` with a free account raises it |
 | Login page never appears, cookie warnings in the browser | Serving over plain HTTP with `AUTH_COOKIE_SECURE=true`. Use HTTPS, or set it to `false` for a pilot |
 | MCP client gets `421` | `MCP_ALLOWED_HOSTS` does not include the host:port used by the client |
@@ -210,6 +212,21 @@ Logs: `docker compose logs -f graphrag-api graphrag-web`. Application logs are a
 - Chunks and extracted values are sent to the AI providers you configure. For sensitive
   corpora, configure an on-premises provider for all three slots: nothing then leaves your
   network.
+
+## 9a. Licensing
+
+Graph-RAG is **free to use and free of charge**. There is no paid tier, no seat limit, no
+feature you need to unlock. A licence, if you get one, does not change what the product does —
+it only tells Acceliance that you are running it.
+
+- **Request a free-of-charge licence by e-mail at contact@acceliance.fr.** Acceliance wants to
+  keep track of which customers use its free-of-use tools; that is the only reason to ask.
+- The licence file you receive contains **nothing but your organisation's name** — no
+  expiry, no seat count, no limitation of use of any kind.
+- **Without a licence, ingestion is capped at 50 PDF documents.** Drop the `.lic` file
+  Acceliance sends you at `./data/api/licence.lic` — no restart needed — and the cap lifts.
+- Check the current state any time: `curl http://localhost:8080/api/licence` reports whether a
+  licence is installed and for whom.
 
 ## 10. Layout of this repository
 
@@ -238,3 +255,7 @@ Two licences apply, on purpose, to two different things:
 | The files of this repository: Compose file, `.env.example`, scripts, reverse-proxy examples, samples (model, PDFs, profiles) | [Apache License 2.0](LICENSE) | Use, modify, redistribute freely, including in your own deployment tooling |
 | The product images `acceliance/graphrag-api` and `acceliance/graphrag-web` | [Acceliance Graph-RAG Image Licence](LICENSE-IMAGES.md) | Free of charge to pull, mirror privately and run, for internal or commercial use; no reverse-engineering, no redistribution, no derivative images. Your data under `./data` is yours |
 | Neo4j Community, Qdrant and the open-source components inside the images | Their own licences (GPL v3, Apache 2.0, …) | Unchanged by either licence above |
+
+A free `.lic` licence file (see *Licensing*, §9a) is provided upon asking by e-mail at
+contact@acceliance.fr. Without it, ingestion is limited to 50 PDF documents; installing the
+free licence unlocks the limit.

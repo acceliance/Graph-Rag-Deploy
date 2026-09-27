@@ -116,5 +116,5 @@ termination for breach you must stop using the Images and delete your copies. Se
 
 ---
 
-Acceliance — [legal form and registered address to be completed before publication] —
+Acceliance — SAS 122 ave de la Résstance 93340 Le Raincy France —
 contact: through the issues of this repository or the address published on acceliance.fr.

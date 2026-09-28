@@ -248,7 +248,7 @@
         "moduleName": {
           "type": "string",
           "title": "String",
-          "description": "Name of the Modelio module that owns this stereotype, used only by Modelio to attach the stereotype to the right module when it imports the model; a stereotype is identified by its name, never by this value. Set it to \"LocalModule\" (the default: the module Modelio uses for the stereotypes defined in the model itself); never leave it null or empty"
+          "description": "Name of the Modelio module that owns this stereotype, used only by Modelio to attach the stereotype to the right module when it imports the model; a stereotype is identified by its name, never by this value. Set it to \"GraphRag\" for the Graph-RAG stereotypes (GraphRagEntity, GraphRagIdentity, GraphRagEmbed): the Modelio module that declares them; never leave it null or empty"
         },
         "name": {
           "type": "string",
@@ -432,7 +432,7 @@
       "title": "List"
     },
     "modelStereotypes": {
-      "description": "All stereotype definitions referenced by the artefacts of this model, each written in full here once, with its stereotypeProperties and its moduleName (\"LocalModule\" by default); artefacts then reference a stereotype and its properties by name",
+      "description": "All stereotype definitions referenced by the artefacts of this model, each written in full here once, with its stereotypeProperties and its moduleName (\"GraphRag\" for the Graph-RAG stereotypes); artefacts then reference a stereotype and its properties by name",
       "type": "array",
       "items": {
         "oneOf": [

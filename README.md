@@ -79,9 +79,10 @@ Never run `docker compose up --build` here: there is no source tree and no `buil
    normalise them, which classes drive the relevance gate. They are GraphRag stereotypes inside
    the model, so a ModelioUtils export annotated with the GraphRag module arrives filled in;
    what you change in the editor is written back into the model. *Initialise*. The model is
-   projected into Neo4j as a metamodel and rendered as a Mermaid diagram. No model yet?
-   [`schemas/README.md`](schemas/README.md) explains how to draft one with an AI assistant from
-   the schema and the sample. Relevance-gate thresholds are set per model version afterwards
+   projected into Neo4j as a metamodel and rendered as a Mermaid diagram. No model yet? Design
+   it in Modelio and export it with its stereotypes ([§3a](#3a-designing-the-model-in-modelio)),
+   or draft one with an AI assistant from the schema and the sample
+   ([`schemas/README.md`](schemas/README.md)). Relevance-gate thresholds are set per model version afterwards
    (*AI settings*).
 4. **Documents.** Drop PDFs. Each one is parsed (OCR for scanned pages), checked for relevance
    against the model (a cooking recipe against a billing model is rejected with a reason),
@@ -93,6 +94,57 @@ Never run `docker compose up --build` here: there is no source tree and no `buil
    own profile, draft its prompt with the Acceliance prompt generator at
    <https://masterprompter.acceliance.fr>, then transcribe the generated fields into the
    profile's front-matter (see [`schemas/README.md`](schemas/README.md)).
+
+## 3a. Designing the model in Modelio
+
+Instead of writing the model JSON by hand, design it as a UML class model in
+[Modelio](https://www.modelio.org/) 5.4 and let two Modelio modules generate the file: the
+**GraphRag** module declares the Graph-RAG stereotypes, and **ModelioUtils** exports the model,
+stereotypes included, in the exact format the *Model* screen uploads
+([`schemas/schema_uml_model.json`](schemas/schema_uml_model.json)).
+
+**Once per Modelio installation**
+
+1. Build and install **ModelioUtils** 5.4.01 from
+   [gitlab.com/jose.torres.acceliance/modelioutils](https://gitlab.com/jose.torres.acceliance/modelioutils).
+   GraphRag requires it.
+2. Add [`modelio/GraphRag_5.4.01.jmdac`](modelio/) to the catalog: *Configuration ▸ Modules
+   catalog ▸ Add a module to the catalog…*.
+
+**Once per Modelio project**
+
+3. In the **Modules** view, deploy ModelioUtils, then GraphRag.
+4. Still in the **Modules** view, select ModelioUtils and set its parameter **Enable Model
+   Export** to true (it is off by default, and also enables the import).
+
+**Designing the model**
+
+5. Model the domain in one package: classes (with a `domain`), attributes, relations and
+   enumerations. Describe each of them: the descriptions are exported and help the extraction.
+6. Apply the stereotypes and fill their tagged values in the element's properties:
+   - `GraphRagIdentity` on each attribute that identifies an instance (with
+     `graphRagNormalise`, and `graphRagIdentityOrder` for a composite key);
+   - `GraphRagEntity` on a class for its matching, anchor, extraction hints and extraction
+     group;
+   - `GraphRagEmbed` on a long String attribute to index on its own (applied once on the class
+     that declares it, subclasses inherit it).
+
+   [`schemas/README.md`](schemas/README.md) lists every tagged value and its allowed values;
+   [`samples/model/billing-model-stereotyped.json`](samples/model/billing-model-stereotyped.json)
+   shows a complete example.
+
+**Generating the model file**
+
+7. Right-click the package ▸ **Export Model** (ModelioUtils), choose the output folder,
+   *Export*. The JSON file holds the model and every GraphRag stereotype applied to it.
+8. Upload that file on the *Model* screen. The settings editor opens already filled in from the
+   stereotypes; *Validate*, then *Initialise* (or *Upgrade* for a new version of a model in use).
+
+**The way back.** A setting changed in the Graph-RAG editor is written into the model as a
+stereotype. *Model ▸ Settings ▸ Download the model* returns the file; right-click the package ▸
+**Import Model** (ModelioUtils) brings the changes back into Modelio, so the Modelio project
+stays the reference. The import needs the GraphRag module deployed in the project, since it
+checks each stereotype property's name and type against it.
 
 ## 4. Configuration reference
 
@@ -159,7 +211,9 @@ notes and registers a job you start from *Jobs*.
 
 *Model ▸ Upgrade* shows a diff (added, removed, renamed classes and attributes, identity-key
 changes) and the cost of re-indexing before you apply. The previous version stays queryable
-until the re-index completes; *Abandon* returns to it at any time.
+until the re-index completes; *Abandon* returns to it at any time. With Modelio
+([§3a](#3a-designing-the-model-in-modelio)), change the model there, export it again and
+upload the new file in *Model ▸ Upgrade*.
 
 ### Backup and restore
 
@@ -248,6 +302,7 @@ schemas/                     JSON Schema for the model, ledger and prompt files 
 samples/model/               billing model (Graph-RAG settings as GraphRag stereotypes)
 samples/pdf/                 two invoices (one references a missing contract) + one recipe
 samples/profiles/            financial-analyst.md · enterprise-architect.md
+modelio/                     GraphRag_<version>.jmdac, the Modelio module of the GraphRag stereotypes (§3a)
 data/                        created at first start, never committed
 ```
 

@@ -3,7 +3,7 @@
   "modelStereotypes": [
     {
       "name": "GraphRagEntity",
-      "moduleName": "LocalModule",
+      "moduleName": "GraphRag",
       "description": "Graph-RAG settings of a class: match strategy, relevance anchor, extraction hints and group.",
       "stereotypeProperties": [
         {
@@ -40,7 +40,7 @@
     },
     {
       "name": "GraphRagIdentity",
-      "moduleName": "LocalModule",
+      "moduleName": "GraphRag",
       "description": "The attribute is part of the class's identity key.",
       "stereotypeProperties": [
         {
@@ -57,7 +57,7 @@
     },
     {
       "name": "GraphRagEmbed",
-      "moduleName": "LocalModule",
+      "moduleName": "GraphRag",
       "description": "The String attribute is indexed on its own in the vector store.",
       "stereotypeProperties": []
     }

@@ -41,14 +41,50 @@ to the model's classes and attributes, recognised by their **name**:
 | `GraphRagIdentity` | an attribute of the identity key | `graphRagIdentityOrder` (1-based, composite keys), `graphRagNormalise` (`trim`, `casefold`, `digits`, `date`, `amount`, `none`) |
 | `GraphRagEmbed` | a String attribute | — (indexed on its own for semantic search) |
 
+A model without stereotypes is valid too: every class is then a value object until identity
+keys are set in the editor.
+
+### Designing the model with Modelio
+
+The model may be designed with [Modelio](https://www.modelio.org/), using the tooling of
+[acceliance/ModelioForDataGovernance](https://github.com/acceliance/ModelioForDataGovernance).
 A Modelio user installs the **GraphRag** module, applies these stereotypes, and uploads the
 ModelioUtils JSON export as is. The *Model* screen reads the settings into its editor; what is
 changed there is written back into the model as stereotypes, so the stored model stays the one
 file that says everything. *Model ▸ Settings ▸ Download the model* returns it, ready for
-ModelioUtils' import.
+ModelioUtils' import. The step-by-step setup, with the module file shipped in
+[`modelio/`](../modelio/), is in [the deployment kit README, §3a](../README.md#3a-designing-the-model-in-modelio).
 
-A model without stereotypes is valid too: every class is then a value object until identity
-keys are set in the editor.
+### `GraphRagEmbed` and extraction groups
+
+The two settings act at different steps of ingestion:
+
+- **Extraction, per group.** Each `graphRagGroup` value is one extraction schema sent to the
+  LLM; every group runs on every accepted document. A class without `graphRagGroup` joins the
+  group named after its `domain` (or `default`). Inside a group, relations between its classes
+  are extracted as full entities; a relation to a class of *another* group is extracted as a
+  reference to that class's identity key only.
+- **Indexing, per entity.** After resolution, each `GraphRagEmbed` attribute of each extracted
+  entity that has a non-empty value becomes its own search point, next to the document chunks
+  (payload `kind: "attribute"`, `classes: [<class>]`, `attr: <attribute>`). The group is not
+  recorded: searches narrow by class, never by group.
+
+What follows for a model author:
+
+1. **An attribute is indexed only where its class is documented.** A class reached only through
+   a relation from another group becomes a *stub* — identity key, no other attributes — and
+   stubs get no attribute points. In the sample, `Contract.scope` carries `GraphRagEmbed` and
+   `Contract` is in the `contracts` group; the two sample invoices (group `billing`) reference
+   `CT-77`, which stays a stub, so no `scope` point exists until a document that states the
+   contract itself is ingested.
+2. **Changing a class's group adds or removes no attribute points by itself.** It changes which
+   classes the LLM extracts alongside it, and so which values it finds; put an embedded class in
+   the group of the documents that actually carry its text, and describe where that text is in
+   `graphRagExtractionHints`.
+3. **Subclasses inherit it.** Apply `GraphRagEmbed` once, on the attribute in the class that
+   declares it (type `String`, checked at load); instances of every subclass get an attribute
+   point for it too. Do not repeat it on a subclass: an inherited attribute carries no
+   stereotype of its own, and the editor's download drops one with a warning.
 
 **Not in the model:** relevance-gate thresholds (`similarityFloor`, `coverageFloor`,
 `confidenceThreshold`). They calibrate the embedding model rather than describe the domain, so
@@ -107,7 +143,7 @@ Rules:
   role names, SCREAMING_SNAKE_CASE for enumeration values. Give every class, attribute,
   relation, enumeration and literal a description written for someone who reads the documents.
 - The Graph-RAG settings are stereotypes, as in the example. Declare the ones you use once, in
-  full, in "modelStereotypes" (moduleName "LocalModule"), with the exact stereotype and
+  full, in "modelStereotypes" (moduleName "GraphRag"), with the exact stereotype and
   property names of the example; then apply them by name in "stereotypeInstances", each value
   as a string in "valueAsString".
 - For every class whose instances recur across documents: put GraphRagIdentity on each

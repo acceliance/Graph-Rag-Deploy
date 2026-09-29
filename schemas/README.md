@@ -95,7 +95,7 @@ they are settings of each model version: *AI settings ▸ Relevance gate of mode
 
 The model can be drafted by Claude, ChatGPT or any assistant that accepts file attachments. The
 schema is self-contained and every property carries a description, so the assistant has what it
-needs. What it does not know are the conventions listed in the prompt below; state them, or the
+needs. What it does not know are the conventions stated in the [prompt](#prompt); give them, or the
 output will fail the checks of the *Model* screen.
 
 Only the model is authored. The ingestion ledger is written by the API and is never uploaded,
@@ -107,7 +107,7 @@ profile's front-matter.
 
 1. Attach two files: `schema_uml_model.json` and
    [`samples/model/billing-model-stereotyped.json`](../samples/model/billing-model-stereotyped.json).
-2. Send the prompt below with your domain filled in.
+2. Send the [prompt](#prompt) with its domain block filled in.
 3. Paste the answer into *Model* (file or text). The screen validates against the schema, then
    runs the checks a schema cannot express: names are unique, every `mother` and relation
    `target` resolves, no inheritance cycle, enumeration targets carry `OneToOne`, tagged values
@@ -119,51 +119,17 @@ profile's front-matter.
 
 ### Prompt
 
-````text
-You are helping me author a data model for Acceliance Graph-RAG, a product that extracts
-typed entities from PDFs into a graph. Attached: the JSON Schema of the model file
-(schema_uml_model.json) and a complete, valid example (billing-model-stereotyped.json).
+The prompt is in [`samples/prompts/generate-graphrag-model.md`](../samples/prompts/generate-graphrag-model.md).
+It gives the assistant the `modelStereotypes` block to copy verbatim, then the rules the *Model*
+screen enforces:
 
-Produce a model for this domain:
-<the kinds of PDFs, their language, the entities I want to question, the identifiers
-printed on the documents (numbers, codes, dates), and the questions I expect to ask>
+- where each GraphRag stereotype may be applied, and the allowed tagged values;
+- naming, enumerations, class ordering and inheritance;
+- entity or value object, and the resulting identity, normalisation, matching, anchor, group
+  and embed settings;
+- a self-check list the assistant runs before answering.
 
-Rules:
-- Answer with one JSON code block and nothing else. It must validate against the schema.
-  Set its "$schema" key to the URL in the schema's "$id".
-- Attribute types are the primitives of ModelType only. A field with a fixed set of values
-  is an enumeration: declare it under "enumerations" and reference it from the class with a
-  relation whose target is {"name": "<EnumName>"} and cardinality "OneToOne". Never name an
-  enumeration as an attribute type.
-- Every class is written in full exactly once in the "classes" array. A relation target or a
-  mother class is referenced by its name as a string, and that class must appear earlier in
-  the array, so order the classes accordingly. Attributes and relations are declared only on
-  the class that owns them, never repeated on a child class.
-- Naming: PascalCase for classes and enumerations, camelCase for attributes and relation
-  role names, SCREAMING_SNAKE_CASE for enumeration values. Give every class, attribute,
-  relation, enumeration and literal a description written for someone who reads the documents.
-- The Graph-RAG settings are stereotypes, as in the example. Declare the ones you use once, in
-  full, in "modelStereotypes" (moduleName "GraphRag"), with the exact stereotype and
-  property names of the example; then apply them by name in "stereotypeInstances", each value
-  as a string in "valueAsString".
-- For every class whose instances recur across documents: put GraphRagIdentity on each
-  attribute printed on the document that identifies one instance, with graphRagNormalise
-  ("digits" for identifiers printed with spaces, "casefold" for names, "date" for dates,
-  "amount" for amounts) and graphRagIdentityOrder when the key has several attributes. Put
-  GraphRagEntity on the class with graphRagAnchor "true" when the presence of this class
-  proves a document belongs to the domain, and graphRagExtractionHints describing the labels,
-  formats and position of the values on the page. Classes that exist only inside one document
-  (a line, a row, a section) get no GraphRagIdentity.
-- Use graphRagMatch "fuzzy" only for classes identified by a name that documents may spell
-  differently; keep graphRagFuzzyThreshold above graphRagReviewBand.
-- graphRagGroup batches classes into one extraction call per group. Set it only to group
-  classes differently from their "domain"; leave it out and each class follows its domain,
-  which is usually enough.
-- Put GraphRagEmbed on String attributes holding long free text worth searching on its own
-  (a clause, a scope, a description).
-- Do not put relevance-gate thresholds in the model: they are set per model version in the
-  product.
-````
+It ends with a template for your domain.
 
 ### Validating outside the product
 

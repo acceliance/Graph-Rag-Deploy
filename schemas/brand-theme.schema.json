@@ -1,8 +1,8 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://owl.acceliance.fr/schemas/brand-theme.schema.json",
-  "title": "Web brand theme (Governance Hub)",
-  "description": "Schema of a Governance Hub customer's reconfigurable web brand theme, for an AI initiatives governance hub client. It describes ONLY the fields actually used by the application: brand identity (name, eyebrow, logos), the colour palette (translated into CSS variables) and free-form CSS variable overrides. The front end applies these tokens at runtime — ThemeProvider (CSS variables + title + favicon), RootLayout (logo, name, eyebrow) and the brand theme admin screen. The document is validated on upload (POST /files/brand-theme). Absent a brand theme, the application keeps its default tokens (§9.1).",
+  "title": "Web brand theme (Graph RAG)",
+  "description": "Schema of a Graph RAG customer's reconfigurable web brand theme. It describes ONLY the fields actually used by the application: brand identity (name, eyebrow, logos), the colour palette (translated into CSS variables) and free-form CSS variable overrides. The front end applies these tokens at runtime — ThemeProvider (CSS variables + title + favicon), RootLayout (logo, name, eyebrow) and the brand theme admin screen. The document is validated on upload (POST /files/brand-theme). Absent a brand theme, the application keeps its default tokens (§9.1).",
   "type": "object",
   "required": ["meta", "brand", "colors"],
   "additionalProperties": false,
@@ -36,12 +36,12 @@
           "type": "string",
           "description": "Displayed brand / product name. Becomes the document title (tab, EF-140) and the header name.",
           "minLength": 1,
-          "examples": ["Acceliance", "BankAssu AI Governance System"]
+          "examples": ["Acceliance", "BankAssu Graph RAG"]
         },
         "eyebrow": {
           "type": "string",
           "description": "Small-caps kicker displayed in the header above the name.",
-          "examples": ["AI GOVERNANCE HUB"]
+          "examples": ["GRAPH RAG"]
         },
         "logo": {
           "type": "object",

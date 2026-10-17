@@ -38,6 +38,9 @@ end, and *Licensing* (§9a) for how to let Acceliance know you're a customer.
 - An AI provider for three roles: **chat** (agent), **extraction** (structured output) and
   **embeddings**. Anthropic serves no embedding model, so embeddings come from OpenAI or an
   on-premises server. Keys are entered in the application after start-up, never in a file.
+  Not sure which models to pick? See the [AI model recommendations](docs/ai-model-recommendations.md):
+  OpenAI and Anthropic models benchmarked on this product for quality and token cost (as of
+  October 2026: `gpt-5.6-luna` for extraction, `claude-haiku-5-5` for chat).
 
 ## 2. Quick start
 
@@ -291,7 +294,9 @@ work the same way. `scripts/backup.ps1` calls Docker, so with `wslc` stop the co
 2. **AI settings** (*Admin ▸ AI settings*). Choose a provider and a model for each of the
    three slots, enter the key or the on-premises URL, press *Test*. For an on-premises server
    also set the context window the model was loaded with. Keys are stored under `./data/api`
-   and re-read on every request — no restart.
+   and re-read on every request — no restart. The
+   [AI model recommendations](docs/ai-model-recommendations.md) list which models suit each
+   slot, what they cost per page and per question, and which ones to avoid.
 3. **Model** (*Model*). Upload a model JSON, or click *Load the sample* (billing model). Check
    its Graph-RAG settings: which attributes identify an instance of each class, how to
    normalise them, which classes drive the relevance gate. They are GraphRag stereotypes inside

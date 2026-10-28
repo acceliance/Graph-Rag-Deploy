@@ -66,7 +66,7 @@ services:
 
   # ── 2. Neo4j — facts store (metamodel + typed instance graph) ───────────────
   neo4j:
-    image: neo4j:${NEO4J_TAG:-5.26-community}
+    image: neo4j:${NEO4J_TAG:-5.26.30-community}
     container_name: graphrag-neo4j
     restart: unless-stopped
     environment:
@@ -143,6 +143,15 @@ services:
       - MCP_ALLOWED_HOSTS=${MCP_ALLOWED_HOSTS:-}
       - MCP_ALLOWED_ORIGINS=${MCP_ALLOWED_ORIGINS:-}
 
+      # A2A endpoint (DFS §7.9): same three states as MCP_ENABLED.
+      - A2A_ENABLED=${A2A_ENABLED:-}
+      - A2A_PUBLIC_URL=${A2A_PUBLIC_URL:-}
+
+      # Admin ▸ Database "clean the whole database": refused unless true (irreversible)
+      - GRAPHRAG_ALLOW_PURGE=${GRAPHRAG_ALLOW_PURGE:-false}
+      # Brand theme: hosts logos / url() may load from; empty => same-origin paths and data: URIs only
+      - THEME_ASSET_HOSTS=${THEME_ASSET_HOSTS:-}
+
       - TZ=${TZ:-Europe/Paris}
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
@@ -173,6 +182,8 @@ services:
     environment:
       - GRAPHRAG_API_UPSTREAM=http://graphrag-api:8000
       - AUTH_MODE=standalone
+      # CSP img-src: same list the API enforces on the brand theme
+      - THEME_ASSET_HOSTS=${THEME_ASSET_HOSTS:-}
     healthcheck:
       test: ["CMD", "curl", "-fsS", "-o", "/dev/null", "http://localhost:80/"]
       interval: 30s

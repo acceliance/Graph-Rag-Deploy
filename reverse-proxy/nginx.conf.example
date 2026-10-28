@@ -15,6 +15,10 @@ server {
     ssl_certificate     /etc/letsencrypt/live/graphrag.example.com/fullchain.pem;
     ssl_certificate_key /etc/letsencrypt/live/graphrag.example.com/privkey.pem;
     add_header Strict-Transport-Security "max-age=31536000" always;
+    # Do NOT add a Content-Security-Policy (or the other security headers) here:
+    # the graphrag-web edge already sends them, its image allow-list built from
+    # THEME_ASSET_HOSTS. A second CSP is enforced on top of the first, so any
+    # difference silently blocks logos or the API docs.
 
     # >= GRAPHRAG_MAX_UPLOAD_MB, with headroom for multipart overhead
     client_max_body_size 60m;

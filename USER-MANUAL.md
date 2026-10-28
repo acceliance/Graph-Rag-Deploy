@@ -841,6 +841,10 @@ Upload a JSON theme ([`schemas/brand-theme.schema.json`](schemas/brand-theme.sch
 name, eyebrow, logos, favicon, colours, CSS variables. Applied at once; an invalid file keeps
 the previous theme. **Download the active theme**, **Remove theme**.
 
+Logos, favicon and `url()` in CSS variables may only point to same-origin paths (`/logo.svg`),
+`data:` URIs, or hosts listed in `THEME_ASSET_HOSTS` (`.env`; empty by default, so browsers
+fetch nothing from the internet for the theme). A file referencing another host is refused.
+
 ### Logs
 
 Filters by **level** (DEBUG / INFO / WARNING / ERROR), **category** (app, ingestion, agent, mcp,

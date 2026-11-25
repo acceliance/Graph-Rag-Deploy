@@ -157,7 +157,15 @@ Requires an initialised model.
 
 - **Upload PDFs** (admin, contributor) — several files at once, or drag and drop. Limits:
   `GRAPHRAG_MAX_UPLOAD_MB` (50 MB) and `GRAPHRAG_MAX_PAGES` (500). Without a licence, ingestion
-  is capped at 50 documents (see *About*).
+  is capped at 50 documents (see *About*). Files over 8 MB are sent in parts automatically; a PDF
+  already split can be dropped part by part, named `report.pdf.part1of3`, `report.pdf.part2of3`…
+  (in one go or several; unfinished parts are kept 24 h).
+- **Import from URL** (admin, shown when the deployment sets `GRAPHRAG_URL_IMPORT_ENABLED=true`) —
+  paste the https address of a public PDF: the server downloads it itself, so large reports never
+  go through the browser. **Import a manifest** takes a CSV file (`file,company,fiscal_year,
+  report_type,framework,language,currency,url,sha256`, `#` lines ignored) and imports each line,
+  with one result per line (imported, refused, checksum mismatch). Imported documents wait in the
+  landing zone like uploads; start their ingestion as usual.
 - **Refresh**; the list also auto-refreshes every 4 s while something is in progress.
 - **State filter** with a count per state.
 - **Retry all failed or stalled (N)**.

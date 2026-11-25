@@ -149,6 +149,11 @@ services:
 
       # Admin ▸ Database "clean the whole database": refused unless true (irreversible)
       - GRAPHRAG_ALLOW_PURGE=${GRAPHRAG_ALLOW_PURGE:-false}
+      # Import from URL (off by default): server-side download of public PDFs
+      - GRAPHRAG_URL_IMPORT_ENABLED=${GRAPHRAG_URL_IMPORT_ENABLED:-false}
+      - GRAPHRAG_URL_IMPORT_HOSTS=${GRAPHRAG_URL_IMPORT_HOSTS:-}
+      - GRAPHRAG_URL_IMPORT_USER_AGENT=${GRAPHRAG_URL_IMPORT_USER_AGENT:-}
+      - GRAPHRAG_URL_IMPORT_TIMEOUT_S=${GRAPHRAG_URL_IMPORT_TIMEOUT_S:-240}
       # Brand theme: hosts logos / url() may load from; empty => same-origin paths and data: URIs only
       - THEME_ASSET_HOSTS=${THEME_ASSET_HOSTS:-}
 

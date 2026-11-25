@@ -209,6 +209,8 @@ wslc run -d --name graphrag-api --network graphrag-net `
   -e "GRAPHRAG_DATA_DIR=/data" `
   -e "GRAPHRAG_MAX_UPLOAD_MB=$($e.GRAPHRAG_MAX_UPLOAD_MB)" -e "GRAPHRAG_MAX_PAGES=$($e.GRAPHRAG_MAX_PAGES)" `
   -e "GRAPHRAG_OCR_LANGS=$($e.GRAPHRAG_OCR_LANGS)" -e "GRAPHRAG_RETENTION_DAYS=$($e.GRAPHRAG_RETENTION_DAYS)" `
+  -e "GRAPHRAG_URL_IMPORT_ENABLED=$($e.GRAPHRAG_URL_IMPORT_ENABLED)" -e "GRAPHRAG_URL_IMPORT_HOSTS=$($e.GRAPHRAG_URL_IMPORT_HOSTS)" `
+  -e "GRAPHRAG_URL_IMPORT_USER_AGENT=$($e.GRAPHRAG_URL_IMPORT_USER_AGENT)" -e "GRAPHRAG_URL_IMPORT_TIMEOUT_S=$($e.GRAPHRAG_URL_IMPORT_TIMEOUT_S)" `
   -e "AGENT_MAX_ITERS=$($e.AGENT_MAX_ITERS)" -e "AGENT_MAX_TOKENS=$($e.AGENT_MAX_TOKENS)" `
   -e "AUTH_COOKIE_SECURE=$($e.AUTH_COOKIE_SECURE)" -e "AUTH_SESSION_TTL_SECONDS=$($e.AUTH_SESSION_TTL_SECONDS)" `
   -e "MCP_ENABLED=$($e.MCP_ENABLED)" -e "MCP_ALLOWED_HOSTS=$($e.MCP_ALLOWED_HOSTS)" `
@@ -390,6 +392,9 @@ All variables live in [`.env.example`](.env.example), with comments. The ones th
 | `GRAPHRAG_MAX_UPLOAD_MB`, `GRAPHRAG_MAX_PAGES` | no | `50`, `500` | Upload limits |
 | `GRAPHRAG_OCR_LANGS` | no | `fra+eng` | OCR languages (packs shipped: French, English) |
 | `GRAPHRAG_RETENTION_DAYS` | no | `0` | Auto-purge documents older than N days |
+| `GRAPHRAG_URL_IMPORT_ENABLED` | no | `false` | Lets administrators import PDFs by URL (the API downloads them: https, port 443, public addresses only, size cap, PDF check, optional SHA-256) |
+| `GRAPHRAG_URL_IMPORT_HOSTS` | no | empty (any public host) | Allow-list for import by URL; `*.example.com` covers subdomains |
+| `GRAPHRAG_URL_IMPORT_USER_AGENT`, `GRAPHRAG_URL_IMPORT_TIMEOUT_S` | no | neutral, `240` | User-Agent of the download (sec.gov wants a contact address) and its overall time limit |
 | `MCP_ENABLED`, `MCP_ALLOWED_HOSTS` | when MCP is used | unset | See *MCP* |
 
 **Not in `.env`, on purpose:** AI provider keys, on-premises URLs and model names. They are

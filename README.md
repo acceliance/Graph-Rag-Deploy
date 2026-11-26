@@ -396,10 +396,37 @@ All variables live in [`.env.example`](.env.example), with comments. The ones th
 | `GRAPHRAG_URL_IMPORT_HOSTS` | no | empty (any public host) | Allow-list for import by URL; `*.example.com` covers subdomains |
 | `GRAPHRAG_URL_IMPORT_USER_AGENT`, `GRAPHRAG_URL_IMPORT_TIMEOUT_S` | no | neutral, `240` | User-Agent of the download (sec.gov wants a contact address) and its overall time limit |
 | `MCP_ENABLED`, `MCP_ALLOWED_HOSTS` | when MCP is used | unset | See *MCP* |
+| `AUTH_MODE` | no | `standalone` | `standalone`, `office365`, `google` or `azure`; see *Signing in with your organisation* |
+| `COMPOSE_PROFILES` | `office365`, `google` | unset | `federated` starts the `oauth2-proxy` sign-in sidecar |
+| `OAUTH2_PROVIDER`, `OAUTH2_OIDC_ISSUER_URL`, `OAUTH2_CLIENT_ID`, `OAUTH2_CLIENT_SECRET`, `OAUTH2_COOKIE_SECRET`, `OAUTH2_REDIRECT_URL` | `office365`, `google` | none | The identity provider and the web application registered on it |
+| `OAUTH2_EMAIL_DOMAIN`, `OAUTH2_COOKIE_DOMAIN`, `OAUTH2_COOKIE_EXPIRE`, `OAUTH2_SCOPE` | no | `*`, empty, `12h`, `openid email profile` | Allowed e-mail domain, cookie domain, sign-in lifetime, requested scopes |
+| `MCP_OAUTH_ISSUER`, `MCP_OAUTH_AUDIENCE`, `MCP_OAUTH_RESOURCE`, `MCP_OAUTH_SCOPES` | no | empty (keys only) | OAuth access tokens on MCP, A2A and the public query API; see *MCP* |
+| `MCP_OAUTH_JWKS_URL`, `MCP_OAUTH_EMAIL_CLAIMS`, `MCP_OAUTH_AUTHORIZATION_SERVERS` | no | discovered, `email,preferred_username,upn`, the issuer | Rarely needed |
+| `A2A_OAUTH_RESOURCE`, `PUBLIC_API_OAUTH_RESOURCE` | no | `MCP_OAUTH_RESOURCE` with `/mcp` → `/a2a`, `/public` | Only when the MCP URL does not end in `/mcp` |
 
 **Not in `.env`, on purpose:** AI provider keys, on-premises URLs and model names. They are
-entered from the application and stored under `./data/api`, so no deployment input ever holds a
+entered from the application and stored under `./data/api`. The only secrets `.env` holds are the
+two database secrets and, in `office365` / `google` mode, the sign-in client secret and cookie
 secret.
+
+### Signing in with your organisation
+
+The authentication modes and OAuth tokens need product images that include them (see the
+release notes); an older `graphrag-web` image stops at start-up in any mode but `standalone`.
+
+| `AUTH_MODE` | Who signs people in | What to set |
+|---|---|---|
+| `standalone` (default) | The application: e-mail and password | nothing |
+| `office365` | Microsoft Entra ID | an Entra app registration (platform *Web*, redirect URI `https://<host>/oauth2/callback`), `COMPOSE_PROFILES=federated`, `OAUTH2_PROVIDER=oidc`, `OAUTH2_OIDC_ISSUER_URL`, `OAUTH2_CLIENT_ID`, `OAUTH2_CLIENT_SECRET`, `OAUTH2_COOKIE_SECRET`, `OAUTH2_REDIRECT_URL` |
+| `google` | Google Workspace | an OAuth client *Web application* with the same redirect URI, `COMPOSE_PROFILES=federated`, `OAUTH2_PROVIDER=google`, the same `OAUTH2_*` lines without the issuer |
+| `azure` | Azure Container Apps *Easy Auth* in front of `graphrag-web` | Authentication on the Container App (Entra ID, *redirect to login*) with the machine paths listed in `.env.example` as excluded paths |
+
+Accounts and roles still live in *Admin ▸ Users*: the identity provider says who signs in, the
+application what they may do. A person the provider lets in but who has no active account sees
+"account not provisioned" instead of the application. On an empty account store, the first
+person to sign in becomes administrator. MCP, A2A and the public query API are never behind the
+sign-in page. `scripts/wslc.ps1` runs `standalone` only; use `scripts/up.ps1` for the other
+modes.
 
 ## 5. Network, TLS and reverse proxy
 
@@ -426,6 +453,15 @@ your own agents through the Model Context Protocol, **read-only**, **off by defa
    `Authorization: Bearer <key>`. Have the host read `graphrag://schema/model` first.
 4. *Admin ▸ MCP ▸ Last connections* shows who called what.
 
+**Without a key (OAuth).** Set `MCP_OAUTH_ISSUER`, `MCP_OAUTH_AUDIENCE`, `MCP_OAUTH_RESOURCE`
+(`https://<host>/api/mcp`) and `MCP_OAUTH_SCOPES` in `.env` (an Entra example and the app
+registration steps are in `.env.example`), then restart. MCP clients such as Claude then open
+your organisation's sign-in page and act as that person, with their Graph-RAG role: an analyst
+cannot add documents. The person's e-mail must be an active account in *Admin ▸ Users*. The key
+keeps working for scripts. The same tokens are accepted by A2A and by the public query API
+(published queries; free GraphQL for administrators). *Admin ▸ MCP*, *A2A* and *API keys* show
+the settings in use and any configuration error.
+
 `MCP_ENABLED=false` in `.env` locks the feature for the whole deployment.
 
 ## 7. Day-2 operations
@@ -440,6 +476,18 @@ scripts/up.sh          # pulls and restarts; ./data is never touched by an image
 The API migrates its own data layout at start-up when needed and refuses to start on data
 written by a newer version (downgrade guard). A release that needs a re-index says so in its
 notes and registers a job you start from *Jobs*.
+
+**Knowing that an update exists.** With `GRAPHRAG_UPDATE_CHECK=true` (the default in
+`.env.example`), graphrag-api reads the public tag list of `acceliance/graphrag-api` and
+`acceliance/graphrag-web` on Docker Hub once a day, and every signed-in user sees a soft green
+ribbon at the top of the application when either image has:
+
+- a **new version**: a higher `X.Y.Z` tag than the running version (About screen), or
+- a **new build**: `:latest` points at a more recent image than the build that runs.
+
+Each user can hide the ribbon with its ✕; it comes back only for a later release or build.
+Nothing else leaves the server, and an unreachable Docker Hub simply means no ribbon. Set
+`GRAPHRAG_UPDATE_CHECK=false` on a site that must make no outbound call.
 
 ### Upgrading the data model
 
@@ -562,6 +610,9 @@ Logs: `docker compose logs -f graphrag-api graphrag-web`. Application logs are a
 - Accounts managed by the application, first-administrator bootstrap, session cookie
   `HttpOnly` / `SameSite=Lax` / `Secure`.
 - MCP off by default, key hashed at rest, host allow-list.
+- Optional sign-in through Microsoft Entra ID, Google Workspace or Azure Easy Auth; optional
+  OAuth tokens on MCP, A2A and the public API, checked for issuer, audience, expiry and scope
+  and tied to an active account.
 - The product images are compiled and constant-hidden; they contain no customer data and no
   secret. Everything mutable is under `./data`, which you own.
 - Chunks and extracted values are sent to the AI providers you configure. For sensitive
